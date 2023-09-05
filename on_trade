@@ -1,0 +1,21 @@
+from blueshift.api import(    symbol,
+                            order_target_percent,
+                            schedule_function,
+                            date_rules,
+                            time_rules,
+                       )
+
+def initialize(context):
+    context.long_portfolio = [symbol('ASIANPAINT'), symbol('TCS')]
+    print("abc")
+
+
+def handle_data(context, data):
+    for security in context.long_portfolio:
+        order_target_percent(security, 0.5)
+
+def on_trade(context, data):
+    print("In on trade function..")
+    current_data = data.current(context.long_portfolio[0], 'close')
+    print(f'current_data:{current_data}')
+    print(type(current_data))
