@@ -1,0 +1,19 @@
+def initialize(context):
+    context.asset = symbol('TCS')
+    context.order_id = None
+    schedule_once(myfunc)
+
+def myfunc(context, data):
+    print("Inside myfunc.....")
+    if context.order_id is None:
+        context.order_id = order(context.asset, 1, 460.00)
+        print(f"order_id:{context.order_id}")
+        if not context.order_id:
+            raise ValueError(f'Something went wrong..')
+
+        schedule_later(myfunc, 1)
+        return
+    
+    # Fetch Open Order
+    open_order = get_open_orders()
+    print(f"Open orders:{open_order}")
