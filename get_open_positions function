@@ -1,0 +1,32 @@
+from blueshift.api import (symbol, 
+                           order, 
+                           date_rules, 
+                           get_datetime,
+                           date_rules, 
+                           time_rules, 
+                           get_open_positions,
+                           set_cooloff_period,
+                           schedule_once,
+                           schedule_later,
+                           get_open_orders)
+
+def initialize(context):
+   context.asset1 = symbol('ITC')
+   context.asset2 = symbol('TCS')
+   context.freq = 60
+
+   schedule_once(trade)
+
+def trade(context, data):
+   oid = order(context.asset1, 1)
+   print(f"Order ID:{oid}")
+
+   if oid:
+      schedule_later(get_positions, 1)
+     
+
+def get_positions(context, data):
+   open_order = get_open_orders()
+   print(f"Open order:{open_order}")
+   open_positions = get_open_positions()
+   print(f"Open positions:{open_positions}")
