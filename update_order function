@@ -1,0 +1,28 @@
+from blueshift.api import schedule_later, schedule_once, symbol, terminate, order, update_order, get_order      
+
+def initialize(context):
+    context.asset = symbol('ITC')
+    context.order_id = None
+    schedule_once(myfunc)
+
+def myfunc(context, data):
+    print("Inside myfunc...")
+    if context.order_id is None:
+        context.order_id = order(context.asset, 1, 460.00)
+        print(f"order_id:{context.order_id}")
+        if not context.order_id:
+            raise ValueError(f'Something went wrong.')
+
+        schedule_later(myfunc, 1)
+        return
+
+    o = get_order(context.order_id)
+    print(f"o:{o}")
+    if o.is_open():
+        px = data.current(context.asset, 'close')
+        print("Now the update function will be executed....")
+        u_o_id = update_order(context.order_id, price=px)
+        print(f"Update order id:{u_o_id}")
+        schedule_later(myfunc, 1)
+    else:
+        terminate(f'order executed, terminate now.')
