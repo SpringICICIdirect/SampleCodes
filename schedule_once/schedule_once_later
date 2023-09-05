@@ -1,0 +1,79 @@
+from blueshift.api import schedule_later, schedule_once, symbol, terminate
+from blueshift.api import terminate, order, update_order, get_order
+
+def initialize(context):
+    context.asset = symbol('ITC')
+    context.order_id = None
+    schedule_once(myfunc)
+
+def myfunc(context, data):
+    if context.order_id is None:
+        context.order_id = order(context.asset, 1)
+        print(f"order_id:{context.order_id}")
+        if not context.order_id:
+            raise ValueError(f'Something went wrong')
+from blueshift.api import schedule_later, schedule_once, symbol, terminate
+from blueshift.api import terminate, order, update_order, get_order
+
+def initialize(context):
+    context.asset = symbol('ITC')
+    context.order_id = Nonefrom blueshift.api import(    symbol,
+                            order_target_percent,
+                            schedule_function,
+                            date_rules,
+                            time_rules,
+                       )
+
+def initialize(context):
+    
+    context.long_portfolio = [
+                               symbol('DIVISLAB'),
+                               symbol('SUNPHARMA'),
+                               symbol('MARUTI'),
+                               symbol('AMARAJABAT'),
+                               symbol('BPCL'),                               
+                               symbol('BAJFINANCE'),
+                               symbol('HDFCBANK'),
+                               symbol('ASIANPAINT'),
+                               symbol('TCS')
+                             ]
+    print(context.long_portfolio)
+    schedule_function(rebalance,
+                    date_rules.month_start(days_offset=0),
+                    time_rules.market_close(hours=2, minutes=30))
+
+
+def rebalance(context,data):
+    for security in context.long_portfolio:
+        order_target_percent(security, 1.0/10)  
+    schedule_once(myfunc)
+
+def myfunc(context, data):
+    if context.order_id is None:
+        context.order_id = order(context.asset, 1)
+        print(f"order_id:{context.order_id}")
+        if not context.order_id:
+            raise ValueError(f'Something went wrong')
+
+        schedule_later(myfunc, 1) # call again after one minute
+        return
+
+    o = get_order(context.order_id)
+    print(f"o:{o}")
+    if o.is_open():
+        px = data.current(context.asset, 'close')
+        update_order(context.order_id, price=px)
+        schedule_later(myfunc, 1) # call again after one minute
+    else:
+        terminate(f'Order executed, terminate now.')
+        schedule_later(myfunc, 1) # call again after one minute
+        return
+
+    o = get_order(context.order_id)
+    print(f"o:{o}")
+    if o.is_open():
+        px = data.current(context.asset, 'close')
+        update_order(context.order_id, price=px)
+        schedule_later(myfunc, 1) # call again after one minute
+    else:
+        terminate(f'Order executed, terminate now.')
