@@ -1,1 +1,18 @@
 
+from blueshift.api import(    symbol,
+                            order_target_percent,
+                            schedule_function,
+                            date_rules,
+                            time_rules,
+                       )
+
+from blueshift.api import get_datetime
+
+def initialize(context):
+    context.securities = [symbol('ITC'), symbol('HDFC')]
+       
+
+def on_data(context, data):
+    current_data = data.current(context.securities[0], 'close')
+    print(f"current_data:{current_data}")
+    print(f"DateTime:{get_datetime()}")
