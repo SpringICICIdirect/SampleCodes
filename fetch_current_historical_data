@@ -1,0 +1,51 @@
+from blueshift.api import symbol
+
+def initialize(context):
+    context.universe = [symbol('ITC'), symbol('TCS')]
+
+def before_trading_start(context, data):
+    # this returns a float value
+    px = data.current(context.universe[0], 'close')
+    print(f"Close price of single asset:{px}")
+
+    # this returns an int value
+    px = data.current(context.universe[0], 'volume')
+    print(f"Volume of single asset:{px}")
+
+    # this returns a pandas.series with the columns in the index
+    px = data.current(context.universe[0], ['open', 'close'])
+    print(f"Open close price of single asset:{px}")
+
+    # this returns a pandas.series with the assets in the index
+    px = data.current(context.universe, 'close')
+    print(f"Close price of list of assets:{px}")
+
+    # this returns a pandas.DataFrame with assets in the index
+    px = data.current(context.universe, ['open', 'close'])
+    print(f"Open and close price of list of assets:{px}")
+
+    # px1 is a series with timestamps as index
+    px1 = data.history(context.universe[0], "close", 3, "1m")
+    print(f"Historical price of single asset:{px}")
+
+    # px2 is a Dataframe with timestamp index and field names as columns
+    px2 = data.history(context.universe[0], ['open', 'close'], 3, '1m')
+    print(f"Historical Open and close price of single asset:{px2}")
+
+    # px3 is a DatFrame with timestamp index and assets as columns
+    px3 = data.history(context.universe, "close", 3, "1m")
+    print(f"Historical Close price of list of assets:{px3}")
+
+    # px4 is a multi-index Frame with field names as columns, asset as the second index level
+    px4 = data.history(context.universe, ["open", "close"], 3, "1m")
+    print(f"Historical Open and close price of list of assets:{px4}")
+
+    # to fetch all fields for an asset, use 'xs'
+    # this returns a regular DataFrame with columns as field names
+    asset_o_price = px4.xs(context.universe[0])
+    print(f"All fields of an asset:{asset_o_price}")
+
+    # to fetch a field for all assets, use subsetting
+    # this returns a regular Dataframe with columns as assets
+    close_prices = px4['close']
+    print(f"Single field of all assets:{close_prices}")
