@@ -1,0 +1,29 @@
+from blueshift.api import(    symbol,
+                            order_target_percent,
+                            schedule_function,
+                            date_rules,
+                            time_rules,
+                       )
+
+def initialize(context):
+    
+    context.long_portfolio = [
+                               symbol('DIVISLAB'),
+                               symbol('SUNPHARMA'),
+                               symbol('MARUTI'),
+                               symbol('AMARAJABAT'),
+                               symbol('BPCL'),                               
+                               symbol('BAJFINANCE'),
+                               symbol('HDFCBANK'),
+                               symbol('ASIANPAINT'),
+                               symbol('TCS')
+                             ]
+    print(context.long_portfolio)
+    schedule_function(rebalance,
+                    date_rules.month_start(days_offset=0),
+                    time_rules.market_close(hours=2, minutes=30))
+
+
+def rebalance(context,data):
+    for security in context.long_portfolio:
+        order_target_percent(security, 1.0/10)   
