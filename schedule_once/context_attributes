@@ -1,0 +1,89 @@
+from blueshift.api import(    symbol,
+                            order_target_percent,
+                            schedule_function,
+                            date_rules,
+                            time_rules,
+                       )
+
+def initialize(context):
+    """
+        A function to define things to do at the start of the strategy
+    """
+    
+    # universe selection
+    context.long_portfolio = [
+                               symbol('DIVISLAB'),
+                               symbol('SUNPHARMA'),
+                               symbol('MARUTI'),
+                               symbol('AMARAJABAT'),
+                               symbol('BPCL'),                               
+                               symbol('BAJFINANCE'),
+                               symbol('HDFCBANK'),
+                               symbol('ASIANPAINT'),
+                               symbol('TCS')
+                             ]
+    
+    # Call rebalance function on the first trading day of each month after 2.5 hours from market open
+    schedule_function(rebalance,
+                    date_rules.month_start(days_offset=0),
+                    time_rules.market_close(hours=2, minutes=30))
+
+def print_report_before_trading(context):
+    account = context.account
+    portfolio = context.portfolio
+    positions = portfolio.positions
+    name = context.name
+    run_mode = context.mode
+    execution_mode = context.execution_mode
+    trading_calendar = context.trading_calendar
+
+    for asset in positions:
+        position = positions[asset]
+        print(f'position for {asset}:{position.quantity}')
+
+    print(f'total portfolio {portfolio.portfolio_value}')
+    print(f'exposure:{account.net_exposure}')
+    print(f'name(str) of the current algo:{name}')
+    print(f'mode of the current algo:{run_mode}')
+    print(f'execution mode of the current algo:{execution_mode}')
+    print(f'trading calendar of the current algo:{trading_calendar}')
+    print(f'Total margin posted with the broker:{account.margin}')
+    print(f'Gross Leverage:{account.gross_leverage}')
+    print(f'Net Leverage:{account.net_leverage}')
+    print(f'Gross Exposure:{account.gross_exposure}')
+    print(f'Total Exposures in Long  Positions:{account.long_exposure}')
+    print(f'Total Exposures in Short Positions:{account.short_exposure}')
+    print(f'Net Exposure across all assets at last updated prices:{account.net_exposure}')
+    print(f'Sum of cash and margin:{account.net_liquidation}')
+    print(f'Net commissions paid:{account.commissions}')
+    print(f'Net trading charges paid:{account.charges}')
+    print(f'Gross exposure across all assets at last updated prices:{account.total_positions_exposure}')
+    print(f'Total value of all holdings:{account.total_positions_value}')
+    print(f'Current portfolio net value:{portfolio.portfolio_value}')
+    print(f'Present gross exposure:{portfolio.positions_exposure}')
+    print(f'Total undeployed cash:{portfolio.cash}')
+    print(f'Starting Capital:{portfolio.starting_cash}')
+    print(f'Cumulative Algo returns:{portfolio.returns}')
+    print(f'Total value of holdings:{portfolio.positions_value}')
+    print(f'Total profit or loss:{portfolio.pnl}')
+    print(f'Start date of the algo:{portfolio.start_date}')
+    print(f'Positions dict:{portfolio.positions}')
+
+def before_trading_start(context, data):
+    print_report_before_trading(context)       
+
+def rebalance(context,data):
+    """
+        A function to rebalance the portfolio, passed on to the call
+        of schedule_function above.
+    """
+    # Position 50% of portfolio to be long in each security
+    for security in context.long_portfolio:
+        order_target_percent(security, 1.0/10)
+
+def print_record_after_trading_hours(context):
+    pl = context.pnls
+    print(f"Profit and Loss:{pl}")
+
+def after_trading_hours(context, data):
+    print_record_after_trading_hours(context)
