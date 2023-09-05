@@ -1,0 +1,11 @@
+from blueshift.api import schedule_later, schedule_once, symbol, order, can_trade   
+
+def initialize(context):
+    context.asset = symbol('TCS')
+    print(f"Asset:{context.asset}")
+    schedule_once(myfunc)
+
+def myfunc(context, data):
+    print("Inside myfunc....")
+    trade = can_trade(context.asset)
+    print(f"Can Trade:{trade}")
