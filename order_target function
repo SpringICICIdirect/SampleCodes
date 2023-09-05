@@ -1,0 +1,33 @@
+from blueshift.api import symbol, order_target, date_rules, time_rules, get_datetime, schedule_function
+
+def initialize(context):
+    context.asset1 = symbol("ITC")
+    context.asset2 = symbol("TCS")
+    context.freq = 60
+
+    schedule_function(trade, date_rules.every_day(), time_rules.every_nth_minute(context.freq))
+
+def trade(context, data):
+  px = data.current([context.asset1, context.asset2],["close", "volume"])
+  order_id = order_target(context.asset1, 2)
+  print(f"order_id:{order_id}")
+
+  if order_id:
+    print(get_datetime())
+    price = px.close[context.asset1]
+    volume = px.volume[context.asset2]
+    print(f"price:{price}")
+    print(f"volume:{volume}")
+
+def on_trade(context, data):
+  portfolio = context.portfolio
+  positions = portfolio.positions
+  account = context.account 
+
+  for asset in positions:
+    position = positions[asset]
+    print(f"position for {asset}:{position.quantity}")
+
+  print(f"Total portfolio:{portfolio.portfolio_value}")
+  print(f"Net cash available on the account:{account.available_funds}")
+  print(f"Net exposure across all assets at last updated prices:{account.net_exposure}")
