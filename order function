@@ -1,0 +1,18 @@
+from blueshift.api import symbol, order, date_rules, get_datetime, schedule_function, date_rules, time_rules
+
+def initialize(context):
+  context.asset1 = symbol('ITC')
+  context.asset2 = symbol('TCS')
+  context.freq = 60
+
+  schedule_function(trade, date_rules.every_day(), time_rules.every_nth_minute(context.freq))
+
+def trade(context, data):
+
+  px = data.current([context.asset1, context.asset2], ['close', 'volume'])
+  oid = order(context.asset1, 1, limit_price=px.close[context.asset1])
+
+  if oid:
+    price = px.close[context.asset1]
+    volume = px.volume[context.asset1]
+    print(f"{get_datetime()}: {context.asset1}@{price}/{volume} sent order ID {oid}")
