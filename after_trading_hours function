@@ -1,1 +1,22 @@
+from blueshift.api import(    symbol,
+                            order_target_percent,
+                            schedule_function,
+                            date_rules,
+                            time_rules,
+                       )
 
+from datetime import datetime
+
+def initialize(context):
+    context.securities = [symbol('NIFTY-I'), symbol('BANKNIFTY-I')]
+
+
+def handle_data(context, data):
+    print('current simulation time {}'.format(datetime.now()))
+    current_data = data.current(context.securities[0], 'close')
+    print(f'current_data:{current_data}')
+    print(type(current_data))
+
+def after_trading_hours(context, data):
+    print("This is printed after trading hour")
+    
