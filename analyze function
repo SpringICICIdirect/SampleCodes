@@ -1,1 +1,32 @@
+from blueshift.api import symbol, order_target_percent, schedule_function, date_rules, time_rules
 
+
+def initialize(context):
+    """
+        There are four symbols ITC, TCS, RELIANCE and HDFC
+    """
+    context.universe = [symbol('ITC'), symbol('TCS'), symbol('RELIANCE'), symbol('HDFC')]
+    schedule_function(rebalance, date_rules.month_start(days_offset=0),
+        time_rules.market_close(hours=2, minutes=30))
+
+
+def rebalance(context, data):
+    """
+        A function to rebalance the portfolio, passed on to the call
+        of schedule_function above.
+    """
+    for security in context.universe:
+        order_target_percent(security, 1.0 / 10)
+
+
+def analyze(context, perf):
+    ITC = symbol('ITC')
+    print(ITC.to_dict())
+    print(context.account.gross_leverage)
+    print(context.portfolio.portfolio_value)
+    
+    positions = context.portfolio.positions
+    for asset in positions:
+        print(f'position for asset {asset}...')
+        print(positions[asset].to_dict())
+        break
